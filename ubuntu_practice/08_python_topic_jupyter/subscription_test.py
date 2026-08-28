@@ -12,6 +12,9 @@
 import rclpy
 from turtlesim.msg import Pose
 
+# 0) rclpy 초기화 (Jazzy 에서는 create_node 전에 반드시 필요)
+rclpy.init()
+
 # 1) 노드 생성
 node = rclpy.create_node('subscription_test')
 
