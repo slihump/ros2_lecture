@@ -3,9 +3,20 @@
 <package format="3">
   <name>controller_tutorials</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>주행제어기 실습 패키지 (22~25강): Bang-Bang, PID, Dual PID, State Machine</description>
   <maintainer email="pw@todo.todo">pw</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>turtlesim</depend>
+  <depend>rcl_interfaces</depend>
+
+  <!-- qmonitor_* / monitor_* 노드는 PyQt5 + matplotlib GUI 사용 (24, 25강) -->
+  <exec_depend>python3-numpy</exec_depend>
+  <exec_depend>python3-matplotlib</exec_depend>
+  <exec_depend>python3-pyqt5</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

@@ -3,9 +3,20 @@
 <package format="3">
   <name>my_first_package</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
+  <description>ROS2 입문 실습 패키지 (10~14강): 토픽/서비스/액션/파라미터/launch</description>
   <maintainer email="pw@todo.todo">pw</maintainer>
-  <license>TODO: License declaration</license>
+  <license>Apache-2.0</license>
+
+  <depend>rclpy</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>turtlesim</depend>
+  <depend>my_first_package_msgs</depend>
+
+  <exec_depend>ros2launch</exec_depend>
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+  <exec_depend>python3-numpy</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

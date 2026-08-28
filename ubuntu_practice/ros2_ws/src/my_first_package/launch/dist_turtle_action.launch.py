@@ -1,12 +1,13 @@
 from launch import LaunchDescription
-from launch_ros.actions import Node, ExcuteProcess
+from launch_ros.actions import Node
+
 
 def generate_launch_description():
     my_launch = LaunchDescription()
 
     turtlesim_node = Node(
-        package='turtlesim', 
-        executable='turtlesim_node', 
+        package='turtlesim',
+        executable='turtlesim_node',
         output='screen',
         parameters=[
             {"background_r": 255},
@@ -16,8 +17,8 @@ def generate_launch_description():
     )
 
     dist_turtle_action_node = Node(
-        package='my_first_package', 
-        executable='dist_turtle_action_server', 
+        package='my_first_package',
+        executable='dist_turtle_action_server',
         output='screen',
     )
 
@@ -25,4 +26,3 @@ def generate_launch_description():
     my_launch.add_action(dist_turtle_action_node)
 
     return my_launch
-    

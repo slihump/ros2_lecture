@@ -11,7 +11,9 @@ class TurtlesimPublisher(Node):
 
     def __init__(self):
         super().__init__('turtlesim_publisher')
-        self.publisher = self.create_publisher(Twist, '/turtlesim/turtle1/cmd_vel', 10)
+        # 상대 토픽 이름: namespace 가 없으면 '/turtle1/cmd_vel',
+        # 14강 launch 처럼 namespace='turtlesim' 이면 '/turtlesim/turtle1/cmd_vel'
+        self.publisher = self.create_publisher(Twist, 'turtle1/cmd_vel', 10)
         timer_period = 0.5
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
@@ -34,5 +36,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
-    
