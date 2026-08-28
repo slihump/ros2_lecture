@@ -1,0 +1,37 @@
+sequenceDiagram
+    %% GoalPoseOrchestrator Sequence Diagram
+    participant ExternalGoal as ExternalGoal
+    participant Turtle as TurtleGoalController
+    participant RotateState as RotateToGoalState
+    participant MoveState as MoveToGoalState
+    participant FinalState as RotateToFinalState
+    participant GoalReached as GoalReachedState
+
+    ExternalGoal->>Turtle: Send goal_pose message
+    Turtle->>RotateState: ChangeState(TRANSITION_ACTIVATE)
+    RotateState-->>Turtle: Activation response
+    Note right of RotateState: Compute heading error\nand publish angle_error & state
+    RotateState->>Turtle: Publish "RotateToGoal_Complete"
+    Turtle->>RotateState: ChangeState(TRANSITION_DEACTIVATE)
+
+    Turtle->>MoveState: ChangeState(TRANSITION_ACTIVATE)
+    MoveState-->>Turtle: Activation response
+    Note right of MoveState: Compute distance error\nand heading correction\npublish distance_error & state
+    MoveState->>Turtle: Publish "MoveToGoal_Complete"
+    Turtle->>MoveState: ChangeState(TRANSITION_DEACTIVATE)
+
+    Turtle->>FinalState: ChangeState(TRANSITION_ACTIVATE)
+    FinalState-->>Turtle: Activation response
+    Note right of FinalState: Compute final orientation error\nand publish angle_error & state
+    FinalState->>Turtle: Publish "RotateToFinal_Complete"
+    Turtle->>FinalState: ChangeState(TRANSITION_DEACTIVATE)
+
+    Turtle->>GoalReached: ChangeState(TRANSITION_ACTIVATE)
+    GoalReached-->>Turtle: Activation response
+    Note right of GoalReached: Publish state "GoalReached"\n(no further transitions)
+
+    %% Preemption Sequence
+    ExternalGoal->>Turtle: New goal_pose message received
+    Note left of Turtle: Preempt current active state\nand restart sequence
+    Turtle->>RotateState: ChangeState(TRANSITION_ACTIVATE)
+    Note right of RotateState: Restart sequence\nfor new goal_pose

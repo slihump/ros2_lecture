@@ -1,0 +1,26 @@
+# 21_ros_domain_bridge를_이용해서_다른_domain_id에_접근해보자.pdf 실습 코드
+#
+# 사전 준비:
+#   sudo apt install ros-jazzy-domain-bridge
+#
+# 실습 순서:
+#   터미널 1) export ROS_DOMAIN_ID=1 ; ros2 run demo_nodes_cpp talker
+#   터미널 2) export ROS_DOMAIN_ID=2 ; ros2 run demo_nodes_py listener   <- 아직 아무것도 못 받음
+#   터미널 3) ros2 run domain_bridge domain_bridge my_bridge.yaml       <- 이 설정 파일 사용
+#   -> 터미널 3을 실행한 순간부터 터미널 2의 listener가 메시지를 받기 시작한다.
+#
+# 브리지를 실행하는 터미널 자체의 ROS_DOMAIN_ID는 상관없다.
+# 아래 from_domain / to_domain 설정이 우선한다.
+
+name: my_bridge
+
+topics:
+  chatter:
+    type: std_msgs/msg/String
+    from_domain: 1
+    to_domain: 2
+    # qos:
+    #   reliability: best_effort
+    # remap: chitter
+    # reversed: True
+    # bidirectional: True
