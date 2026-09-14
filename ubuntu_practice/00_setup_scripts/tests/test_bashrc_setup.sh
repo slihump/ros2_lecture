@@ -4,7 +4,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SETUP_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 TEST_HOME="$(mktemp -d /tmp/ros2-bashrc-test.XXXXXX)"
-trap 'rm -rf "$TEST_HOME"' EXIT
+LEGACY_HOME="$(mktemp -d /tmp/ros2-bashrc-legacy-test.XXXXXX)"
+trap 'rm -rf "$TEST_HOME" "$LEGACY_HOME"' EXIT
+
+fail() {
+  echo "FAIL: $*" >&2
+  exit 1
+}
 
 touch "$TEST_HOME/.bashrc"
 HOME="$TEST_HOME" "$SETUP_DIR/04_bashrc_setup.sh" >/dev/null
@@ -35,5 +41,27 @@ HOME="$TEST_HOME" env -u ROS_DOMAIN_ID -u ROS_VERSION \
 # Re-running the installer must not append a duplicate managed block.
 HOME="$TEST_HOME" "$SETUP_DIR/04_bashrc_setup.sh" >/dev/null
 test "$(grep -c '^# === ros2_lecture bashrc snippet ===$' "$TEST_HOME/.bashrc")" -eq 1
+test "$(grep -c '^# === end ros2_lecture bashrc snippet ===$' "$TEST_HOME/.bashrc")" -eq 1
+
+# An existing legacy block must be replaced without deleting later user settings.
+cat > "$LEGACY_HOME/.bashrc" <<'BASHRC'
+export KEEP_BEFORE_ROS2_BLOCK=yes
+# === ros2_lecture bashrc snippet ===
+export ROS_DOMAIN_ID=13
+source /opt/ros/jazzy/setup.bash
+alias jazzy='venv_ros; source /opt/ros/jazzy/setup.bash; ros_domain'
+PS1="legacy prompt"
+export KEEP_AFTER_ROS2_BLOCK=yes
+BASHRC
+
+HOME="$LEGACY_HOME" "$SETUP_DIR/04_bashrc_setup.sh" >/dev/null
+test -f "$LEGACY_HOME/.bashrc.ros2_lecture.bak" || fail "legacy update must create a backup"
+test "$(grep -c '^# === ros2_lecture bashrc snippet ===$' "$LEGACY_HOME/.bashrc")" -eq 1 || fail "legacy update must keep one start marker"
+test "$(grep -c '^# === end ros2_lecture bashrc snippet ===$' "$LEGACY_HOME/.bashrc")" -eq 1 || fail "legacy update must add one end marker"
+grep -q '^export KEEP_BEFORE_ROS2_BLOCK=yes$' "$LEGACY_HOME/.bashrc" || fail "content before the legacy block was lost"
+grep -q '^export KEEP_AFTER_ROS2_BLOCK=yes$' "$LEGACY_HOME/.bashrc" || fail "content after the legacy block was lost"
+if grep -q '^export ROS_DOMAIN_ID=13$' "$LEGACY_HOME/.bashrc"; then
+  fail "legacy ROS_DOMAIN_ID setting was not replaced"
+fi
 
 echo "bashrc setup behavior: PASS"
