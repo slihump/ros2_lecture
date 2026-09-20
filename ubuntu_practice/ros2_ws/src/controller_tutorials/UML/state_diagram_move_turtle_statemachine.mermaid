@@ -35,9 +35,17 @@ classDiagram
         + COMPLETE
     }
     
-    TurtleGoalController --> PID : uses
-    TurtleGoalController --> ControllerState : manages
+    TurtleGoalController --> PID : 사용
+    TurtleGoalController --> ControllerState : 관리
     ControllerState <|-- RotateToGoalState
     ControllerState <|-- MoveToGoalState
     ControllerState <|-- RotateToFinalState
     ControllerState <|-- GoalReachedState
+
+    note for TurtleGoalController "거북이 목표 제어기: 목표 자세와 PID 제어기를 관리"
+    note for ControllerState "제어 상태의 공통 추상 인터페이스"
+    note for RotateToGoalState "목표 위치를 향해 회전"
+    note for MoveToGoalState "목표 위치까지 이동"
+    note for RotateToFinalState "목표 자세의 최종 방향으로 회전"
+    note for GoalReachedState "목표에 도달한 뒤 정지"
+    note for StateResult "상태 처리 결과: CONTINUE(계속), COMPLETE(완료)"

@@ -1,45 +1,45 @@
 flowchart TD
-  %% 구독하는 토픽들 (Subscriptions)
-  subgraph Subscriptions
+  %% 구독하는 토픽들
+  subgraph Subscriptions[구독 토픽]
     A[goal_pose - Pose]
     B[turtle1/pose - Pose]
   end
 
-  %% 컨트롤러 노드 (Controller Node)
-  subgraph Controller_Node
-    C[TurtleGoalController]
+  %% 컨트롤러 노드
+  subgraph Controller_Node[제어기 노드]
+    C["거북이 목표 제어기 (TurtleGoalController)"]
   end
 
-  %% 상태 (States)
-  subgraph States
-    D[idle]
-    E[rotate_to_goal]
-    F[move_to_goal]
-    G[rotate_to_final]
-    H[goal_reached]
+  %% 상태
+  subgraph States[상태]
+    D["대기 (idle)"]
+    E["목표 방향 회전 (rotate_to_goal)"]
+    F["목표 위치 이동 (move_to_goal)"]
+    G["최종 방향 회전 (rotate_to_final)"]
+    H["목표 도달 (goal_reached)"]
   end
 
-  %% 발행하는 토픽들 (Publications)
-  subgraph Publications
+  %% 발행하는 토픽들
+  subgraph Publications[발행 토픽]
     I[turtle1/cmd_vel - Twist]
     J[error - Float64]
   end
 
-  %% 데이터 흐름 (Data Flow)
+  %% 데이터 흐름
   A --> C
   B --> C
   
-  C -->|goal_pose callback sets state| E
+  C -->|goal_pose 콜백에서 상태 설정| E
   
-  E -->|Compute heading error| I
-  E --if error <= tol--> F
+  E -->|목표 방향 오차 계산| I
+  E --오차가 허용 범위 이내--> F
   
-  F -->|Compute distance error and adjust heading| I
-  F --if error <= tol--> G
+  F -->|거리 오차 계산 및 방향 보정| I
+  F --오차가 허용 범위 이내--> G
   
-  G -->|Compute final orientation error| I
-  G --if error <= tol--> H
+  G -->|최종 방향 오차 계산| I
+  G --오차가 허용 범위 이내--> H
   
-  H -->|Publish zero Twist| I
+  H -->|"정지 명령 발행 (Twist 값 0)"| I
   
-  C -->|Publishes error messages| J
+  C -->|오차 메시지 발행| J
