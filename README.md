@@ -36,3 +36,34 @@ cd ~/ros2_lecture && explorer.exe ros2_5-25_guide.html
 
 가이드의 **준비 A → B → C** 를 한 번 실행한 뒤, **07강 ~ 25강**을 순서대로 따라갑니다.
 필요한 설치·가상환경·빌드 명령이 모두 가이드 안에 순서대로 들어 있습니다.
+
+---
+
+## Go2 실습 압축파일 자동 설치
+
+Go2 실습용 압축파일 4개를 직접 내려받고 풀 필요 없이 설치 스크립트 하나로 준비할 수 있습니다.
+
+```bash
+cd ~/Downloads
+curl -LO https://raw.githubusercontent.com/slihump/ros2_lecture/main/install_go2_packages.sh
+bash install_go2_packages.sh
+```
+
+다음 폴더가 `~/ws/` 아래에 생성됩니다.
+
+```text
+~/ws/go2_3d
+~/ws/go2_ctrl
+~/ws/go2_slam
+~/ws/go2_tf
+```
+
+설치 스크립트는 네 ZIP 파일을 모두 다운로드하고 압축 상태를 검사한 뒤 설치합니다.
+같은 이름의 폴더가 이미 있으면 기존 실습 파일을 보호하기 위해 덮어쓰지 않고 종료합니다.
+
+`curl` 또는 `unzip` 명령이 없다는 안내가 나오면 한 번만 설치하고 다시 실행하세요.
+
+```bash
+sudo apt update
+sudo apt install -y curl unzip
+```
