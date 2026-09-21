@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>ROS2 State Monitor</title>
+  <title>ROS2 상태 모니터</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -19,13 +19,13 @@
   </style>
 </head>
 <body>
-  <h1>ROS2 State Monitor</h1>
+  <h1>ROS2 상태 모니터</h1>
   <div id="stateInfo">
-    <p id="stateDisplay">Current State: N/A</p>
-    <p id="angleError">Angle Error: N/A</p>
-    <p id="distanceError">Distance Error: N/A</p>
-    <p id="poseInfo">Turtle Pose: N/A</p>
-    <p id="goalInfo">Goal Pose: N/A</p>
+    <p id="stateDisplay">현재 상태: 수신 대기</p>
+    <p id="angleError">각도 오차: 수신 대기</p>
+    <p id="distanceError">거리 오차: 수신 대기</p>
+    <p id="poseInfo">거북이 자세: 수신 대기</p>
+    <p id="goalInfo">목표 자세: 수신 대기</p>
   </div>
   
   <!-- 캔버스: 상태 원 및 화살표 -->
@@ -43,15 +43,15 @@
     });
     
     ros.on('connection', function() {
-      console.log('Connected to websocket server.');
+      console.log('웹소켓 서버에 연결되었습니다.');
     });
     
     ros.on('error', function(error) {
-      console.error('Error connecting to websocket server: ', error);
+      console.error('웹소켓 서버 연결 오류: ', error);
     });
     
     ros.on('close', function() {
-      console.log('Connection to websocket server closed.');
+      console.log('웹소켓 서버 연결이 종료되었습니다.');
     });
     
     // /web/aggregated_state 토픽 구독 (std_msgs/String)
@@ -68,6 +68,12 @@
     var stateCtx = stateCanvas.getContext("2d");
     // 네 가지 상태와 원의 위치를 정의합니다.
     var states = ["RotateToGoal", "MoveToGoal", "RotateToFinal", "GoalReached"];
+    var stateLabels = {
+      RotateToGoal: "목표 방향 회전",
+      MoveToGoal: "목표 위치 이동",
+      RotateToFinal: "최종 방향 회전",
+      GoalReached: "목표 도달"
+    };
     var circlePositions = [
       {x: 100, y: 100},
       {x: 300, y: 100},
@@ -135,10 +141,10 @@
         }
         stateCtx.stroke();
         // 상태 이름 표시
-        stateCtx.font = "16px Arial";
+        stateCtx.font = "14px Arial";
         stateCtx.textAlign = "center";
         stateCtx.fillStyle = "black";
-        stateCtx.fillText(states[i], pos.x, pos.y);
+        stateCtx.fillText(stateLabels[states[i]], pos.x, pos.y);
       }
     }
     
@@ -188,29 +194,29 @@
       try {
         currentData = JSON.parse(message.data);
       } catch(e) {
-        console.error("Error parsing JSON:", e);
+        console.error("JSON 해석 오류:", e);
         return;
       }
       
       // 텍스트 정보 업데이트
-      document.getElementById("stateDisplay").innerText = "Current State: " + (currentData.state || "N/A");
-      document.getElementById("angleError").innerText = "Angle Error: " + (currentData.angle_error !== null ? currentData.angle_error : "N/A");
-      document.getElementById("distanceError").innerText = "Distance Error: " + (currentData.distance_error !== null ? currentData.distance_error : "N/A");
+      document.getElementById("stateDisplay").innerText = "현재 상태: " + (stateLabels[currentData.state] || currentData.state || "수신 대기");
+      document.getElementById("angleError").innerText = "각도 오차: " + (currentData.angle_error !== null ? currentData.angle_error : "수신 대기");
+      document.getElementById("distanceError").innerText = "거리 오차: " + (currentData.distance_error !== null ? currentData.distance_error : "수신 대기");
       
       if (currentData.turtle_pose) {
-        document.getElementById("poseInfo").innerText = "Turtle Pose: x=" + currentData.turtle_pose.x.toFixed(2) +
+        document.getElementById("poseInfo").innerText = "거북이 자세: x=" + currentData.turtle_pose.x.toFixed(2) +
                                                         ", y=" + currentData.turtle_pose.y.toFixed(2) +
                                                         ", theta=" + currentData.turtle_pose.theta.toFixed(2);
       } else {
-        document.getElementById("poseInfo").innerText = "Turtle Pose: N/A";
+        document.getElementById("poseInfo").innerText = "거북이 자세: 수신 대기";
       }
       
       if (currentData.goal_pose) {
-        document.getElementById("goalInfo").innerText = "Goal Pose: x=" + currentData.goal_pose.x.toFixed(2) +
+        document.getElementById("goalInfo").innerText = "목표 자세: x=" + currentData.goal_pose.x.toFixed(2) +
                                                         ", y=" + currentData.goal_pose.y.toFixed(2) +
                                                         ", theta=" + currentData.goal_pose.theta.toFixed(2);
       } else {
-        document.getElementById("goalInfo").innerText = "Goal Pose: N/A";
+        document.getElementById("goalInfo").innerText = "목표 자세: 수신 대기";
       }
       
       // 상태 원과 화살표 그리기

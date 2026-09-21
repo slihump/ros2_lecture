@@ -1,37 +1,37 @@
 sequenceDiagram
-    %% GoalPoseOrchestrator Sequence Diagram
-    participant ExternalGoal as ExternalGoal
-    participant Turtle as TurtleGoalController
-    participant RotateState as RotateToGoalState
-    participant MoveState as MoveToGoalState
-    participant FinalState as RotateToFinalState
-    participant GoalReached as GoalReachedState
+    %% 목표 자세 제어 시퀀스 다이어그램
+    participant ExternalGoal as 외부 목표 입력
+    participant Turtle as 거북이 목표 제어기 (TurtleGoalController)
+    participant RotateState as 목표 방향 회전 (RotateToGoalState)
+    participant MoveState as 목표 위치 이동 (MoveToGoalState)
+    participant FinalState as 최종 방향 회전 (RotateToFinalState)
+    participant GoalReached as 목표 도달 (GoalReachedState)
 
-    ExternalGoal->>Turtle: Send goal_pose message
-    Turtle->>RotateState: ChangeState(TRANSITION_ACTIVATE)
-    RotateState-->>Turtle: Activation response
-    Note right of RotateState: Compute heading error\nand publish angle_error & state
-    RotateState->>Turtle: Publish "RotateToGoal_Complete"
-    Turtle->>RotateState: ChangeState(TRANSITION_DEACTIVATE)
+    ExternalGoal->>Turtle: goal_pose 메시지 전송
+    Turtle->>RotateState: 상태 활성화: ChangeState(TRANSITION_ACTIVATE)
+    RotateState-->>Turtle: 활성화 응답
+    Note right of RotateState: 목표 방향 오차 계산<br/>angle_error와 state 발행
+    RotateState->>Turtle: "RotateToGoal_Complete" 발행
+    Turtle->>RotateState: 상태 비활성화: ChangeState(TRANSITION_DEACTIVATE)
 
-    Turtle->>MoveState: ChangeState(TRANSITION_ACTIVATE)
-    MoveState-->>Turtle: Activation response
-    Note right of MoveState: Compute distance error\nand heading correction\npublish distance_error & state
-    MoveState->>Turtle: Publish "MoveToGoal_Complete"
-    Turtle->>MoveState: ChangeState(TRANSITION_DEACTIVATE)
+    Turtle->>MoveState: 상태 활성화: ChangeState(TRANSITION_ACTIVATE)
+    MoveState-->>Turtle: 활성화 응답
+    Note right of MoveState: 거리 오차 계산 및 방향 보정<br/>distance_error와 state 발행
+    MoveState->>Turtle: "MoveToGoal_Complete" 발행
+    Turtle->>MoveState: 상태 비활성화: ChangeState(TRANSITION_DEACTIVATE)
 
-    Turtle->>FinalState: ChangeState(TRANSITION_ACTIVATE)
-    FinalState-->>Turtle: Activation response
-    Note right of FinalState: Compute final orientation error\nand publish angle_error & state
-    FinalState->>Turtle: Publish "RotateToFinal_Complete"
-    Turtle->>FinalState: ChangeState(TRANSITION_DEACTIVATE)
+    Turtle->>FinalState: 상태 활성화: ChangeState(TRANSITION_ACTIVATE)
+    FinalState-->>Turtle: 활성화 응답
+    Note right of FinalState: 최종 방향 오차 계산<br/>angle_error와 state 발행
+    FinalState->>Turtle: "RotateToFinal_Complete" 발행
+    Turtle->>FinalState: 상태 비활성화: ChangeState(TRANSITION_DEACTIVATE)
 
-    Turtle->>GoalReached: ChangeState(TRANSITION_ACTIVATE)
-    GoalReached-->>Turtle: Activation response
-    Note right of GoalReached: Publish state "GoalReached"\n(no further transitions)
+    Turtle->>GoalReached: 상태 활성화: ChangeState(TRANSITION_ACTIVATE)
+    GoalReached-->>Turtle: 활성화 응답
+    Note right of GoalReached: "GoalReached" 상태 발행<br/>(추가 상태 전이 없음)
 
-    %% Preemption Sequence
-    ExternalGoal->>Turtle: New goal_pose message received
-    Note left of Turtle: Preempt current active state\nand restart sequence
-    Turtle->>RotateState: ChangeState(TRANSITION_ACTIVATE)
-    Note right of RotateState: Restart sequence\nfor new goal_pose
+    %% 새 목표에 의한 선점 시퀀스
+    ExternalGoal->>Turtle: 새 goal_pose 메시지 수신
+    Note left of Turtle: 현재 활성 상태를 중단하고<br/>시퀀스 다시 시작
+    Turtle->>RotateState: 상태 활성화: ChangeState(TRANSITION_ACTIVATE)
+    Note right of RotateState: 새 goal_pose에 대해<br/>시퀀스 다시 시작
